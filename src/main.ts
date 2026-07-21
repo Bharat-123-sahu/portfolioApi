@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 import { connectToMongoDB } from './config/database.config';
@@ -9,8 +10,11 @@ import { connectToMongoDB } from './config/database.config';
 async function bootstrap() {
   await connectToMongoDB();
 
-  const app = await NestFactory.create(AppModule);
 
+const app = await NestFactory.create<NestExpressApplication>(AppModule);
+app.useStaticAssets(join(process.cwd(), 'uploads'), {
+  prefix: '/uploads',
+});
   app.enableCors();
 
   app.useGlobalPipes(

@@ -26,7 +26,7 @@ import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { ListExperienceDto } from './dto/list-experience.dto';
 
 @ApiTags('Experience')
-@ApiBearerAuth('Authorization')
+// @ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/experience')
 export class ExperienceController {
   private readonly logger = new Logger(ExperienceController.name);
@@ -34,7 +34,7 @@ export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Create Experience',
@@ -102,8 +102,8 @@ export class ExperienceController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Update Experience',
     description: 'Update an experience.',
@@ -129,8 +129,8 @@ export class ExperienceController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete Experience',
     description: 'Delete experience by id.',

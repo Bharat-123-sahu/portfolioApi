@@ -24,7 +24,7 @@ export class SkillsService {
     return {
       success: true,
       message: 'Skill created successfully.',
-      data: skill,
+      skill: skill,
     };
   }
 
@@ -42,7 +42,7 @@ export class SkillsService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [skills, total] = await Promise.all([
       SkillModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -60,7 +60,7 @@ export class SkillsService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      skills,
     };
   }
 
@@ -73,7 +73,7 @@ export class SkillsService {
 
     return {
       success: true,
-      data: skill,
+      skill: skill,
     };
   }
 
@@ -93,7 +93,7 @@ export class SkillsService {
     return {
       success: true,
       message: 'Skill updated successfully.',
-      data: skill,
+      skill: skill,
     };
   }
 

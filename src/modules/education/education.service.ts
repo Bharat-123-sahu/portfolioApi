@@ -24,7 +24,7 @@ export class EducationService {
     return {
       success: true,
       message: 'Education created successfully.',
-      data: education,
+      education: education,
     };
   }
 
@@ -42,7 +42,7 @@ export class EducationService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [education, total] = await Promise.all([
       EducationModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -62,7 +62,7 @@ export class EducationService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      education,
     };
   }
 
@@ -80,7 +80,7 @@ export class EducationService {
 
     return {
       success: true,
-      data: education,
+      education: education,
     };
   }
 
@@ -104,7 +104,7 @@ export class EducationService {
     return {
       success: true,
       message: 'Education updated successfully.',
-      data: education,
+      education: education,
     };
   }
 

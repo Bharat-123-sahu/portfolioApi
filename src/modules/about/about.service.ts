@@ -27,7 +27,7 @@ export class AboutService {
     return {
       success: true,
       message: 'About created successfully.',
-      data: aboutData,
+      about: aboutData,
     };
   }
 
@@ -45,7 +45,7 @@ export class AboutService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [abouts, total] = await Promise.all([
       AboutModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -60,7 +60,7 @@ export class AboutService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      abouts,
     };
   }
 
@@ -73,7 +73,7 @@ export class AboutService {
 
     return {
       success: true,
-      data: about,
+      about: about,
     };
   }
 
@@ -93,7 +93,7 @@ export class AboutService {
     return {
       success: true,
       message: 'About updated successfully.',
-      data: about,
+      about: about,
     };
   }
 

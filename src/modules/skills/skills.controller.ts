@@ -26,7 +26,7 @@ import { SkillsService } from './skills.service';
 import { ListSkillDto } from './dto/list-skills.dto';
 
 @ApiTags('Skill')
-@ApiBearerAuth('Authorization')
+// @ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/skills')
 export class SkillsController {
   private readonly logger = new Logger(SkillsController.name);
@@ -104,7 +104,7 @@ export class SkillsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Update Skill',
     description: 'Update existing skill.',
@@ -130,7 +130,7 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Delete Skill',
     description: 'Delete skill by id.',

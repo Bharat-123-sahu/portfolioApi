@@ -34,8 +34,8 @@ export class EducationController {
   constructor(private readonly experienceService: EducationService) {}
 
   @Post()
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Create Education',
     description: 'Create a new education.',
@@ -102,8 +102,8 @@ export class EducationController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Update Education',
     description: 'Update an education.',
@@ -129,8 +129,8 @@ export class EducationController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Delete Education',
     description: 'Delete education by id.',

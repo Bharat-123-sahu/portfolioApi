@@ -18,6 +18,12 @@ import { EducationModule } from './modules/education/education.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { ResumeModule } from './modules/resume/resume.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { BlogsModule } from './modules/blogs/blogs.module';
+import { CertificatesModule } from './modules/certificates/certificates.module';
+import { ContactModule } from './modules/contact/contact.module';
+import { SocialLinksModule } from './modules/social-links/social-links.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -38,6 +44,12 @@ import { UploadModule } from './modules/upload/upload.module';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
+    DashboardModule,
+    BlogsModule,
+    CertificatesModule,
+    ContactModule,
+    SocialLinksModule,
+    SettingsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService, JwtStrategy],

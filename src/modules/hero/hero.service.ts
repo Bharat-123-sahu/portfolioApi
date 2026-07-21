@@ -23,7 +23,7 @@ export class HeroService {
     return {
       success: true,
       message: 'Hero created successfully.',
-      data: heroData,
+      hero: heroData,
     };
   }
 
@@ -41,7 +41,7 @@ export class HeroService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [heros, total] = await Promise.all([
       HeroModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -56,7 +56,7 @@ export class HeroService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      heros,
     };
   }
 
@@ -79,7 +79,7 @@ export class HeroService {
       return {
         success: true,
         message: 'Hero updated successfully.',
-        data: hero,
+        hero: hero,
       };
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

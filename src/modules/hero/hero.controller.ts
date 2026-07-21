@@ -39,7 +39,7 @@ export class HeroController {
   @ApiOperation({
     summary: 'Get All Heroes',
   })
-  async findAll(@Query() listHeroDto:ListHeroDto) {
+  async findAll(@Query() listHeroDto: ListHeroDto) {
     this.logger.log('Get All Heroes API called');
     return this.heroService.findAll(listHeroDto);
   }
@@ -50,11 +50,11 @@ export class HeroController {
   })
   async findOne(@Param('id') id: string) {
     this.logger.log(`Get Hero API called. Id: ${id}`);
-    return  this.heroService.findOne(+id);
+    return this.heroService.findOne(+id);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  
   @ApiOperation({
     summary: 'Update Hero',
   })
@@ -64,7 +64,7 @@ export class HeroController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  
   @ApiOperation({
     summary: 'Delete Hero',
   })

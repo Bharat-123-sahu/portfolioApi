@@ -19,8 +19,8 @@ import { UpdateAboutDto } from './dto/update-about.dto';
 import { ListAboutDto } from './dto/list-about.dto';
 
 @ApiTags('About')
-@ApiBearerAuth('JWT-auth')
-@Controller('/api/v1/admin/about')
+// @ApiBearerAuth('JWT-auth')
+@Controller('api/v1/admin/about')
 export class AboutController {
   private readonly logger = new Logger(AboutController.name);
 
@@ -54,8 +54,8 @@ export class AboutController {
   }
 
   @Patch(':id')
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
+  // @ApiBearerAuth('JWT-auth')
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Update About',
   })
@@ -68,7 +68,7 @@ export class AboutController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Delete About',
   })

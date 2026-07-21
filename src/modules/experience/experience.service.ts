@@ -19,7 +19,7 @@ export class ExperienceService {
     return {
       success: true,
       message: 'Experience created successfully.',
-      data: experience,
+      experience: experience,
     };
   }
 
@@ -37,7 +37,7 @@ export class ExperienceService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [experiences, total] = await Promise.all([
       ExperienceModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -55,7 +55,7 @@ export class ExperienceService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      experiences,
     };
   }
 
@@ -68,7 +68,7 @@ export class ExperienceService {
 
     return {
       success: true,
-      data: experience,
+      experience: experience,
     };
   }
 
@@ -86,7 +86,7 @@ export class ExperienceService {
     return {
       success: true,
       message: 'Experience updated successfully.',
-      data: experience,
+      experience: experience,
     };
   }
 
