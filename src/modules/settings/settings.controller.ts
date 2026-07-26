@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,13 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { SettingsService } from './settings.service';
 import { ListSettingsDto } from './dto/list-settings.dto';
 import { CreateSettingsDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 
 @ApiTags('Settings')
-@ApiBearerAuth()
 @Controller('settings')
 export class SettingsController {
   constructor(
@@ -30,6 +31,8 @@ export class SettingsController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create Settings' })
   @ApiResponse({
     status: 201,
@@ -55,6 +58,8 @@ export class SettingsController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Settings' })
   update(
     @Param('id') id: string,
@@ -64,6 +69,8 @@ export class SettingsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Delete Settings' })
   remove(@Param('id') id: string) {
     return this.settingsService.remove(id);

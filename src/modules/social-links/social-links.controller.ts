@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,13 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateSocialLinkDto } from './dto/create-social-link.dto';
 import { UpdateSocialLinkDto } from './dto/update-social-link.dto';
 import { SocialLinkService } from './social-links.service';
 import { ListSocialLinkDto } from './dto/list-social-links.dto';
 
 @ApiTags('Social Link')
-@ApiBearerAuth()
 @Controller('social-link')
 export class SocialLinkController {
   constructor(
@@ -30,6 +31,8 @@ export class SocialLinkController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create Social Link' })
   @ApiResponse({
     status: 201,
@@ -57,6 +60,8 @@ export class SocialLinkController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Social Link' })
   update(
     @Param('id') id: string,
@@ -66,6 +71,8 @@ export class SocialLinkController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Delete Social Link' })
   remove(@Param('id') id: string) {
     return this.socialLinkService.remove(id);

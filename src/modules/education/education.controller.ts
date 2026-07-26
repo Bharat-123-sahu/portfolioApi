@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,13 +19,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { EducationService } from './education.service';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { UpdateEducationDto } from './dto/update-education.dto';
 import { ListEducationDto } from './dto/list-education.dto';
 
 @ApiTags('Education')
-@ApiBearerAuth('JWT-auth')
 @Controller('/api/v1/admin/education')
 export class EducationController {
   private readonly logger = new Logger(EducationController.name);
@@ -34,8 +33,8 @@ export class EducationController {
   constructor(private readonly experienceService: EducationService) {}
 
   @Post()
-  // @ApiBearerAuth('JWT-auth')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Education',
     description: 'Create a new education.',
@@ -102,8 +101,8 @@ export class EducationController {
   }
 
   @Patch(':id')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Education',
     description: 'Update an education.',
@@ -129,8 +128,8 @@ export class EducationController {
   }
 
   @Delete(':id')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Education',
     description: 'Delete education by id.',

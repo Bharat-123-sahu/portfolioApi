@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,13 +19,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { SkillsService } from './skills.service';
 import { ListSkillDto } from './dto/list-skills.dto';
 
 @ApiTags('Skill')
-// @ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/skills')
 export class SkillsController {
   private readonly logger = new Logger(SkillsController.name);
@@ -34,6 +33,8 @@ export class SkillsController {
   constructor(private readonly skillService: SkillsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Skill',
     description: 'Create a new skill.',
@@ -104,7 +105,8 @@ export class SkillsController {
   }
 
   @Patch(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Skill',
     description: 'Update existing skill.',
@@ -130,7 +132,8 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Skill',
     description: 'Delete skill by id.',

@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,13 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { ListContactDto } from './dto/list-contact.dto';
 
 @ApiTags('Contact')
-@ApiBearerAuth()
 @Controller('contact')
 export class ContactController {
   constructor(
@@ -30,6 +31,8 @@ export class ContactController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Contact',
   })
@@ -87,6 +90,8 @@ export class ContactController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Contact',
   })
@@ -103,6 +108,8 @@ export class ContactController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Contact',
   })

@@ -4,12 +4,7 @@ import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './modules/auth/auth.controller';
-import { AuthService } from './modules/auth/auth.service';
-import { jwtConfig } from './config/jwt.config';
-import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './common/strategies/jwt/jwt';
+import { AuthModule } from './modules/auth/auth.module';
 import { HeroModule } from './modules/hero/hero.module';
 import { AboutModule } from './modules/about/about.module';
 import { SkillsModule } from './modules/skills/skills.module';
@@ -30,8 +25,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    JwtModule.register(jwtConfig),
-    PassportModule,
+    AuthModule,
     HeroModule,
     AboutModule,
     SkillsModule,
@@ -51,7 +45,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     SocialLinksModule,
     SettingsModule,
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService, JwtStrategy],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,13 +19,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ListProjectDto } from './dto/list.project.dto';
 
 @ApiTags('Project')
-@ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/projects')
 export class ProjectsController {
   private readonly logger = new Logger(ProjectsController.name);
@@ -34,7 +33,8 @@ export class ProjectsController {
   constructor(private readonly projectService: ProjectsService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Project',
     description: 'Create a new project.',
@@ -105,7 +105,8 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Project',
     description: 'Update existing project.',
@@ -131,7 +132,8 @@ export class ProjectsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Project',
     description: 'Delete project by id.',

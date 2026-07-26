@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ResumeService } from './resume.service';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
@@ -27,7 +27,6 @@ import { ListResumeDto } from './dto/list-resume-dto';
 
 
 @ApiTags('Resume')
-@ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/resumes')
 export class ResumeController {
   private readonly logger = new Logger(ResumeController.name);
@@ -35,7 +34,8 @@ export class ResumeController {
   constructor(private readonly resumeService: ResumeService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Resume',
     description: 'Create a new resume.',
@@ -102,7 +102,8 @@ export class ResumeController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Resume',
     description: 'Update existing resume.',
@@ -128,7 +129,8 @@ export class ResumeController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Resume',
     description: 'Delete resume by id.',

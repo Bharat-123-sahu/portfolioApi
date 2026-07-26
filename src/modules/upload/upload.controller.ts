@@ -2,19 +2,23 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   Body,
 } from '@nestjs/common';
 
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { multerOptions } from 'src/common/multer.config';
 @ApiTags('Upload')
 @Controller('admin/upload')
 export class UploadController {
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

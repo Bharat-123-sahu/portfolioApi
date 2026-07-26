@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,13 +19,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ExperienceService } from './experience.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { ListExperienceDto } from './dto/list-experience.dto';
 
 @ApiTags('Experience')
-// @ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/experience')
 export class ExperienceController {
   private readonly logger = new Logger(ExperienceController.name);
@@ -34,8 +33,8 @@ export class ExperienceController {
   constructor(private readonly experienceService: ExperienceService) {}
 
   @Post()
-  // @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Experience',
     description: 'Create a new experience.',
@@ -102,8 +101,8 @@ export class ExperienceController {
   }
 
   @Patch(':id')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Experience',
     description: 'Update an experience.',
@@ -129,8 +128,8 @@ export class ExperienceController {
   }
 
   @Delete(':id')
-  // @UseGuards(AuthGuard('jwt'))
-  // @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Experience',
     description: 'Delete experience by id.',

@@ -3,12 +3,10 @@ import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { HeroModel } from 'src/@database/hero.model';
 import mongoose from 'mongoose';
-import { Logger } from 'src/common/logger/logger.service';
 import { ListHeroDto } from './dto/list-hero.dto';
 
 @Injectable()
 export class HeroService {
-  private readonly logger = new Logger(HeroService.name);
   async create(createHeroDto: CreateHeroDto) {
     const hero = await HeroModel(mongoose.connection).findOne({
       title: createHeroDto.title, // unique field
@@ -65,47 +63,35 @@ export class HeroService {
   }
 
   async update(id: string, updateHeroDto: UpdateHeroDto) {
-    try {
-      const hero = await HeroModel(mongoose.connection).findById(id);
+    const hero = await HeroModel(mongoose.connection).findById(id);
 
-      if (!hero) {
-        throw new HttpException('Hero not found.', HttpStatus.NOT_FOUND);
-      }
-
-      Object.assign(hero, updateHeroDto);
-
-      await hero.save();
-
-      return {
-        success: true,
-        message: 'Hero updated successfully.',
-        hero: hero,
-      };
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      this.logger.error(error);
-      throw error;
+    if (!hero) {
+      throw new HttpException('Hero not found.', HttpStatus.NOT_FOUND);
     }
+
+    Object.assign(hero, updateHeroDto);
+
+    await hero.save();
+
+    return {
+      success: true,
+      message: 'Hero updated successfully.',
+      hero: hero,
+    };
   }
 
   async remove(id: string) {
-    try {
-      const hero = await HeroModel(mongoose.connection).findById(id);
+    const hero = await HeroModel(mongoose.connection).findById(id);
 
-      if (!hero) {
-        throw new HttpException('Hero not found.', HttpStatus.NOT_FOUND);
-      }
-
-      await hero.deleteOne();
-
-      return {
-        success: true,
-        message: 'Hero deleted successfully.',
-      };
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      this.logger.error(error);
-      throw error;
+    if (!hero) {
+      throw new HttpException('Hero not found.', HttpStatus.NOT_FOUND);
     }
+
+    await hero.deleteOne();
+
+    return {
+      success: true,
+      message: 'Hero deleted successfully.',
+    };
   }
 }

@@ -10,16 +10,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { HeroService } from './hero.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { ListHeroDto } from './dto/list-hero.dto';
 
 @ApiTags('Hero')
-@ApiBearerAuth('Authorization')
 @Controller('/api/v1/admin/hero')
 export class HeroController {
   private readonly logger = new Logger(HeroController.name);
@@ -27,6 +26,8 @@ export class HeroController {
   constructor(private readonly heroService: HeroService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Hero',
   })
@@ -54,7 +55,8 @@ export class HeroController {
   }
 
   @Patch(':id')
-  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Hero',
   })
@@ -64,7 +66,8 @@ export class HeroController {
   }
 
   @Delete(':id')
-  
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Hero',
   })

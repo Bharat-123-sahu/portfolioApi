@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,13 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateCertificateDto } from './dto/create-certificate.dto';
 import { UpdateCertificateDto } from './dto/update-certificate.dto';
 import { ListCertificateDto } from './dto/list-certificate.dto';
 import { CertificateService } from './certificates.service';
 
 @ApiTags('Certificate')
-@ApiBearerAuth()
 @Controller('certificate')
 export class CertificateController {
   constructor(
@@ -30,6 +31,8 @@ export class CertificateController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create Certificate' })
   @ApiResponse({
     status: 201,
@@ -56,6 +59,8 @@ export class CertificateController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Certificate' })
   update(
     @Param('id') id: string,
@@ -65,6 +70,8 @@ export class CertificateController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Delete Certificate' })
   remove(@Param('id') id: string) {
     return this.certificateService.remove(id);

@@ -10,16 +10,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AboutService } from './about.service';
 import { CreateAboutDto } from './dto/create-about.dto';
 import { UpdateAboutDto } from './dto/update-about.dto';
 import { ListAboutDto } from './dto/list-about.dto';
 
 @ApiTags('About')
-// @ApiBearerAuth('JWT-auth')
 @Controller('api/v1/admin/about')
 export class AboutController {
   private readonly logger = new Logger(AboutController.name);
@@ -27,6 +26,8 @@ export class AboutController {
   constructor(private readonly aboutService: AboutService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create About',
   })
@@ -54,8 +55,8 @@ export class AboutController {
   }
 
   @Patch(':id')
-  // @ApiBearerAuth('JWT-auth')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update About',
   })
@@ -68,7 +69,8 @@ export class AboutController {
   }
 
   @Delete(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete About',
   })

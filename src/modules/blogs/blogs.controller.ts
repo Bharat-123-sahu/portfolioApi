@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,18 +17,20 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { ListBlogDto } from './dto/list-blog.dto';
 import { BlogService } from './blogs.service';
 
 @ApiTags('Blog')
-// @ApiBearerAuth()
 @Controller('blog')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Create Blog',
   })
@@ -84,6 +87,8 @@ export class BlogController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Blog',
   })
@@ -95,6 +100,8 @@ export class BlogController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Delete Blog',
   })
