@@ -59,5 +59,11 @@ const SkillSchema = new Schema<ISkill>(
   },
 );
 
+SkillSchema.index({ slug: 1 }, { unique: true });
+SkillSchema.index({ displayOrder: 1, createdAt: -1 });
+SkillSchema.index({ isActive: 1, displayOrder: 1, createdAt: -1 });
+SkillSchema.index({ name: 1 });
+SkillSchema.index({ updatedAt: -1 });
+
 export const SkillModel = (connection: Connection) =>
   connection.model<ISkill>('Skill', SkillSchema);

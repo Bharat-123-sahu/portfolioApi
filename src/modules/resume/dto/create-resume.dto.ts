@@ -1,36 +1,48 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsInt,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateResumeDto {
+
   @ApiProperty({
-    example: 'Latest Resume',
+    example: 'Professional Resume',
   })
   @IsString()
   title: string;
 
   @ApiProperty({
-    example: 'resume.pdf',
+    example: '1.0',
   })
   @IsString()
-  fileName: string;
+  version: string;
 
   @ApiProperty({
-    example: 'uploads/resume.pdf',
+    example: '/uploads/resumes/resume.pdf',
   })
   @IsString()
-  fileUrl: string;
+  resumeFile: string;
 
   @ApiProperty({
-    example: '2.0',
+    example: 'My latest professional resume',
     required: false,
   })
   @IsOptional()
   @IsString()
-  version?: string;
+  description?: string;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  displayOrder?: number;
 
   @ApiProperty({
     example: true,

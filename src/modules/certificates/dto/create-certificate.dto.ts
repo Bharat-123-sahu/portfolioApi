@@ -18,11 +18,13 @@ export class CreateCertificateDto {
   @MaxLength(200)
   issuer: string;
 
-  @IsDateString()
+  @IsOptional()
+  // @IsDateString()
   issueDate: string;
 
   @IsOptional()
-  @IsDateString()
+  // @IsDateString()
+
   expiryDate?: string;
 
   @IsOptional()

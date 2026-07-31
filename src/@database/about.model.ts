@@ -61,5 +61,9 @@ const AboutSchema = new Schema<IAbout>(
   },
 );
 
+AboutSchema.index({ heading: 1 });
+AboutSchema.index({ isActive: 1, createdAt: -1 });
+AboutSchema.index({ createdAt: -1 });
+
 export const AboutModel = (connection: Connection) =>
   connection.model<IAbout>('About', AboutSchema);

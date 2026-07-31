@@ -26,6 +26,8 @@ import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { ListExperienceDto } from './dto/list-experience.dto';
 
 @ApiTags('Experience')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/experience')
 export class ExperienceController {
   private readonly logger = new Logger(ExperienceController.name);
@@ -76,6 +78,26 @@ export class ExperienceController {
   async findAll(@Query() listExperienceDto: ListExperienceDto) {
     this.logger.log('Get Experience List API Called');
     return this.experienceService.findAll(listExperienceDto);
+  }
+
+  @Get('current')
+  @ApiOperation({
+    summary: 'Get Current Experience',
+    description: 'Retrieve active experiences marked as current.',
+  })
+  async findCurrent() {
+    this.logger.log('Get Current Experience API Called');
+    return this.experienceService.findCurrent();
+  }
+
+  @Get('active')
+  @ApiOperation({
+    summary: 'Get Active Experiences',
+    description: 'Retrieve active experiences.',
+  })
+  async findActive() {
+    this.logger.log('Get Active Experiences API Called');
+    return this.experienceService.findActive();
   }
 
   @Get(':id')

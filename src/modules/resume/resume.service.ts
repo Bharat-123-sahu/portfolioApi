@@ -14,7 +14,7 @@ export class ResumeService {
   async create(createResumeDto: CreateResumeDto) {
     if (createResumeDto.isDefault) {
       await ResumeModel(mongoose.connection).updateMany(
-        {},
+        { isDefault: true },
         {
           isDefault: false,
         },
@@ -28,7 +28,7 @@ export class ResumeService {
     return {
       success: true,
       message: 'Resume created successfully.',
-      data: resume,
+      resume: resume,
     };
   }
 
@@ -46,14 +46,15 @@ export class ResumeService {
         }
       : {};
 
-    const [data, total] = await Promise.all([
+    const [resumes, total] = await Promise.all([
       ResumeModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
         .limit(perPage)
         .sort({
           createdAt: -1,
-        }),
+        })
+        .lean(),
 
       ResumeModel(mongoose.connection).countDocuments(searchFilter),
     ]);
@@ -63,12 +64,12 @@ export class ResumeService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      data,
+      resumes,
     };
   }
 
   async findOne(id: string) {
-    const resume = await ResumeModel(mongoose.connection).findById(id);
+    const resume = await ResumeModel(mongoose.connection).findById(id).lean();
 
     if (!resume) {
       throw new HttpException('Resume not found.', HttpStatus.NOT_FOUND);
@@ -76,27 +77,43 @@ export class ResumeService {
 
     return {
       success: true,
-      data: resume,
+      resume: resume,
+    };
+  }
+
+  async findDefault() {
+    const resume = await ResumeModel(mongoose.connection)
+      .findOne({
+        isDefault: true,
+        isActive: true,
+      })
+      .lean();
+
+    if (!resume) {
+      throw new HttpException('Default resume not found.', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      success: true,
+      resume,
     };
   }
 
   async update(id: string, updateResumeDto: UpdateResumeDto) {
     if (updateResumeDto.isDefault) {
       await ResumeModel(mongoose.connection).updateMany(
-        {},
+        { _id: { $ne: id }, isDefault: true },
         {
           isDefault: false,
         },
       );
     }
 
-    const resume = await ResumeModel(mongoose.connection).findByIdAndUpdate(
-      id,
-      updateResumeDto,
-      {
+    const resume = await ResumeModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateResumeDto, {
         new: true,
-      },
-    );
+      })
+      .lean();
 
     if (!resume) {
       throw new HttpException('Resume not found.', HttpStatus.NOT_FOUND);
@@ -105,12 +122,15 @@ export class ResumeService {
     return {
       success: true,
       message: 'Resume updated successfully.',
-      data: resume,
+      resume: resume,
     };
   }
 
   async remove(id: string) {
-    const resume = await ResumeModel(mongoose.connection).findByIdAndDelete(id);
+    const resume = await ResumeModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!resume) {
       throw new HttpException('Resume not found.', HttpStatus.NOT_FOUND);

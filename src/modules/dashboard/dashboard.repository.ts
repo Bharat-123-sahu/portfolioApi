@@ -19,39 +19,65 @@ export class DashboardRepositoryService {
   async getCounts() {
     const [
       skills,
-      projects,
-      blogs,
+      projectCounts,
+      blogCounts,
       experiences,
       education,
       certificates,
       contacts,
-      activeProjects,
-      publishedBlogs,
     ] = await Promise.all([
       SkillModel(mongoose.connection).countDocuments(),
-      ProjectModel(mongoose.connection).countDocuments(),
-      BlogModel(mongoose.connection).countDocuments(),
+      ProjectModel(mongoose.connection).aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: 1 },
+            active: {
+              $sum: {
+                $cond: [{ $eq: ['$isActive', true] }, 1, 0],
+              },
+            },
+          },
+        },
+      ]),
+      BlogModel(mongoose.connection).aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: 1 },
+            published: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ['$isPublished', true] },
+                      { $eq: ['$isActive', true] },
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      ]),
       ExperienceModel(mongoose.connection).countDocuments(),
       EducationModel(mongoose.connection).countDocuments(),
       CertificateModel(mongoose.connection).countDocuments(),
       ContactModel(mongoose.connection).countDocuments(),
-      ProjectModel(mongoose.connection).countDocuments({ isActive: true }),
-      BlogModel(mongoose.connection).countDocuments({
-        isPublished: true,
-        isActive: true,
-      }),
     ]);
 
     return {
       skills,
-      projects,
-      blogs,
+      projects: projectCounts[0]?.total || 0,
+      blogs: blogCounts[0]?.total || 0,
       experiences,
       education,
       certificates,
       contacts,
-      activeProjects,
-      publishedBlogs,
+      activeProjects: projectCounts[0]?.active || 0,
+      publishedBlogs: blogCounts[0]?.published || 0,
     };
   }
 
@@ -72,44 +98,40 @@ export class DashboardRepositoryService {
   }
 
   async getRecentActivities() {
-    const [
-      projects,
-      blogs,
-      skills,
-      certificates,
-      contacts,
-    ] = await Promise.all([
-      ProjectModel(mongoose.connection)
-        .find()
-        .select('title createdAt updatedAt')
-        .sort({ updatedAt: -1 })
-        .limit(this.latestLimit)
-        .lean(),
-      BlogModel(mongoose.connection)
-        .find()
-        .select('title createdAt updatedAt')
-        .sort({ updatedAt: -1 })
-        .limit(this.latestLimit)
-        .lean(),
-      SkillModel(mongoose.connection)
-        .find()
-        .select('name createdAt updatedAt')
-        .sort({ updatedAt: -1 })
-        .limit(this.latestLimit)
-        .lean(),
-      CertificateModel(mongoose.connection)
-        .find()
-        .select('title createdAt updatedAt')
-        .sort({ updatedAt: -1 })
-        .limit(this.latestLimit)
-        .lean(),
-      ContactModel(mongoose.connection)
-        .find()
-        .select('name createdAt updatedAt')
-        .sort({ updatedAt: -1 })
-        .limit(this.latestLimit)
-        .lean(),
-    ]);
+    const [projects, blogs, skills, certificates, contacts] = await Promise.all(
+      [
+        ProjectModel(mongoose.connection)
+          .find()
+          .select('title createdAt updatedAt')
+          .sort({ updatedAt: -1 })
+          .limit(this.latestLimit)
+          .lean(),
+        BlogModel(mongoose.connection)
+          .find()
+          .select('title createdAt updatedAt')
+          .sort({ updatedAt: -1 })
+          .limit(this.latestLimit)
+          .lean(),
+        SkillModel(mongoose.connection)
+          .find()
+          .select('name createdAt updatedAt')
+          .sort({ updatedAt: -1 })
+          .limit(this.latestLimit)
+          .lean(),
+        CertificateModel(mongoose.connection)
+          .find()
+          .select('title createdAt updatedAt')
+          .sort({ updatedAt: -1 })
+          .limit(this.latestLimit)
+          .lean(),
+        ContactModel(mongoose.connection)
+          .find()
+          .select('name createdAt updatedAt')
+          .sort({ updatedAt: -1 })
+          .limit(this.latestLimit)
+          .lean(),
+      ],
+    );
 
     return [
       ...projects.map((item) => this.toActivity('Project', item.title, item)),

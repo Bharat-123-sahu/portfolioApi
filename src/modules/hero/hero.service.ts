@@ -8,9 +8,12 @@ import { ListHeroDto } from './dto/list-hero.dto';
 @Injectable()
 export class HeroService {
   async create(createHeroDto: CreateHeroDto) {
-    const hero = await HeroModel(mongoose.connection).findOne({
-      title: createHeroDto.title, // unique field
-    });
+    const hero = await HeroModel(mongoose.connection)
+      .findOne({
+        title: createHeroDto.title, // unique field
+      })
+      .select('_id')
+      .lean();
 
     if (hero) {
       throw new HttpException('Hero already exists.', HttpStatus.CONFLICT);
@@ -44,7 +47,8 @@ export class HeroService {
         .find(searchFilter)
         .skip(skip)
         .limit(perPage)
-        .sort({ createdAt: -1 }),
+        .sort({ createdAt: -1 })
+        .lean(),
 
       HeroModel(mongoose.connection).countDocuments(searchFilter),
     ]);
@@ -58,8 +62,17 @@ export class HeroService {
     };
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} hero`;
+  async findOne(id: string) {
+    const hero = await HeroModel(mongoose.connection).findById(id).lean();
+
+    if (!hero) {
+      throw new HttpException('Hero not found.', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      success: true,
+      hero,
+    };
   }
 
   async update(id: string, updateHeroDto: UpdateHeroDto) {

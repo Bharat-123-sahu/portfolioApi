@@ -11,9 +11,12 @@ export class SkillsService {
   private readonly logger = new Logger(SkillsService.name);
 
   async create(createSkillDto: CreateSkillDto) {
-    const exists = await SkillModel(mongoose.connection).findOne({
-      slug: createSkillDto.slug,
-    });
+    const exists = await SkillModel(mongoose.connection)
+      .findOne({
+        slug: createSkillDto.slug,
+      })
+      .select('_id')
+      .lean();
 
     if (exists) {
       throw new HttpException('Skill already exists.', HttpStatus.CONFLICT);
@@ -50,7 +53,8 @@ export class SkillsService {
         .sort({
           displayOrder: 1,
           createdAt: -1,
-        }),
+        })
+        .lean(),
 
       SkillModel(mongoose.connection).countDocuments(searchFilter),
     ]);
@@ -65,7 +69,7 @@ export class SkillsService {
   }
 
   async findOne(id: string) {
-    const skill = await SkillModel(mongoose.connection).findById(id);
+    const skill = await SkillModel(mongoose.connection).findById(id).lean();
 
     if (!skill) {
       throw new HttpException('Skill not found.', HttpStatus.NOT_FOUND);
@@ -78,13 +82,11 @@ export class SkillsService {
   }
 
   async update(id: string, updateSkillDto: UpdateSkillDto) {
-    const skill = await SkillModel(mongoose.connection).findByIdAndUpdate(
-      id,
-      updateSkillDto,
-      {
+    const skill = await SkillModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateSkillDto, {
         new: true,
-      },
-    );
+      })
+      .lean();
 
     if (!skill) {
       throw new HttpException('Skill not found.', HttpStatus.NOT_FOUND);
@@ -98,7 +100,10 @@ export class SkillsService {
   }
 
   async remove(id: string) {
-    const skill = await SkillModel(mongoose.connection).findByIdAndDelete(id);
+    const skill = await SkillModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!skill) {
       throw new HttpException('Skill not found.', HttpStatus.NOT_FOUND);

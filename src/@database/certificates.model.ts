@@ -14,6 +14,8 @@ export interface ICertificate {
   isActive: boolean;
 }
 
+
+
 const CertificateSchema = new Schema<ICertificate>(
   {
     title: {
@@ -24,13 +26,13 @@ const CertificateSchema = new Schema<ICertificate>(
 
     issuer: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
 
     issueDate: {
       type: Date,
-      required: true,
+      // required: true,
     },
 
     expiryDate: {
@@ -87,6 +89,10 @@ CertificateSchema.index({ issuer: 1 });
 CertificateSchema.index({ issueDate: -1 });
 CertificateSchema.index({ displayOrder: 1 });
 CertificateSchema.index({ isActive: 1 });
+CertificateSchema.index({ title: 1, issuer: 1 });
+CertificateSchema.index({ displayOrder: 1, issueDate: -1 });
+CertificateSchema.index({ isActive: 1, displayOrder: 1, issueDate: -1 });
+CertificateSchema.index({ updatedAt: -1 });
 
 export const CertificateModel = (connection: Connection) =>
   connection.model<ICertificate>('Certificate', CertificateSchema);

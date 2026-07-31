@@ -3,10 +3,7 @@ import { DashboardRepositoryService } from './dashboard.repository';
 
 @Injectable()
 export class DashboardService {
-
-  constructor(
-    private readonly repository: DashboardRepositoryService,
-  ) {}
+  constructor(private readonly repository: DashboardRepositoryService) {}
 
   async getDashboard() {
     const [
@@ -24,6 +21,7 @@ export class DashboardService {
       this.getRecentActivities(),
       this.getStorageInfo(),
       this.getSystemStatus(),
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       this.getQuickActions(),
     ]);
 

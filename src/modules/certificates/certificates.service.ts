@@ -1,11 +1,5 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
-
 
 import { CreateCertificateDto } from './dto/create-certificate.dto';
 import { UpdateCertificateDto } from './dto/update-certificate.dto';
@@ -17,12 +11,13 @@ export class CertificateService {
   private readonly logger = new Logger(CertificateService.name);
 
   async create(createCertificateDto: CreateCertificateDto) {
-    const certificate = await CertificateModel(
-      mongoose.connection,
-    ).findOne({
-      title: createCertificateDto.title,
-      issuer: createCertificateDto.issuer,
-    });
+    const certificate = await CertificateModel(mongoose.connection)
+      .findOne({
+        title: createCertificateDto.title,
+        issuer: createCertificateDto.issuer,
+      })
+      .select('_id')
+      .lean();
 
     if (certificate) {
       throw new HttpException(
@@ -31,9 +26,9 @@ export class CertificateService {
       );
     }
 
-    const certificateData = await CertificateModel(
-      mongoose.connection,
-    ).create(createCertificateDto);
+    const certificateData = await CertificateModel(mongoose.connection).create(
+      createCertificateDto,
+    );
 
     return {
       success: true,
@@ -78,7 +73,8 @@ export class CertificateService {
           issueDate: -1,
         })
         .skip(skip)
-        .limit(perPage),
+        .limit(perPage)
+        .lean(),
 
       CertificateModel(mongoose.connection).countDocuments(filter),
     ]);
@@ -93,15 +89,12 @@ export class CertificateService {
   }
 
   async findOne(id: string) {
-    const certificate = await CertificateModel(
-      mongoose.connection,
-    ).findById(id);
+    const certificate = await CertificateModel(mongoose.connection)
+      .findById(id)
+      .lean();
 
     if (!certificate) {
-      throw new HttpException(
-        'Certificate not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Certificate not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -110,21 +103,15 @@ export class CertificateService {
     };
   }
 
-  async update(
-    id: string,
-    updateCertificateDto: UpdateCertificateDto,
-  ) {
-    const certificate = await CertificateModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateCertificateDto, {
-      new: true,
-    });
+  async update(id: string, updateCertificateDto: UpdateCertificateDto) {
+    const certificate = await CertificateModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateCertificateDto, {
+        new: true,
+      })
+      .lean();
 
     if (!certificate) {
-      throw new HttpException(
-        'Certificate not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Certificate not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -135,15 +122,13 @@ export class CertificateService {
   }
 
   async remove(id: string) {
-    const certificate = await CertificateModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const certificate = await CertificateModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!certificate) {
-      throw new HttpException(
-        'Certificate not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Certificate not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

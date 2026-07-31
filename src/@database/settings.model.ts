@@ -214,6 +214,9 @@ const SettingsSchema = new Schema<ISettings>(
 );
 
 SettingsSchema.index({ isActive: 1 });
+SettingsSchema.index({ siteTitle: 1 });
+SettingsSchema.index({ isActive: 1, createdAt: -1 });
+SettingsSchema.index({ createdAt: -1 });
 
 export const SettingsModel = (connection: Connection) =>
   connection.model<ISettings>('Settings', SettingsSchema);

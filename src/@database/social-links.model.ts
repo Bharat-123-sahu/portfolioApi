@@ -84,6 +84,15 @@ SocialLinkSchema.index({ platform: 1 });
 SocialLinkSchema.index({ displayOrder: 1 });
 SocialLinkSchema.index({ isVisible: 1 });
 SocialLinkSchema.index({ isActive: 1 });
+SocialLinkSchema.index({ displayOrder: 1, createdAt: -1 });
+SocialLinkSchema.index({
+  isVisible: 1,
+  isActive: 1,
+  displayOrder: 1,
+  createdAt: -1,
+});
+SocialLinkSchema.index({ username: 1 });
+SocialLinkSchema.index({ updatedAt: -1 });
 
 export const SocialLinkModel = (connection: Connection) =>
   connection.model<ISocialLink>('SocialLink', SocialLinkSchema);

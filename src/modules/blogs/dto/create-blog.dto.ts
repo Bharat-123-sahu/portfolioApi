@@ -4,7 +4,6 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  IsUrl,
   MaxLength,
   Min,
   ArrayUnique,
@@ -54,7 +53,7 @@ export class CreateBlogDto {
   author?: string;
 
   @IsOptional()
- @IsDateString()
+  @IsDateString()
   publishedDate?: string;
 
   @IsOptional()

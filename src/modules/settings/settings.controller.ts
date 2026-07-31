@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,11 +25,11 @@ import { CreateSettingsDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 
 @ApiTags('Settings')
-@Controller('settings')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
+@Controller('api/v1/admin/settings')
 export class SettingsController {
-  constructor(
-    private readonly settingsService: SettingsService,
-  ) {}
+  constructor(private readonly settingsService: SettingsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -57,15 +58,13 @@ export class SettingsController {
     return this.settingsService.findOne(id);
   }
 
-  @Put(':id')
+  @Put()
+  // @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Settings' })
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateSettingDto,
-  ) {
-    return this.settingsService.update(id, dto);
+  update(@Body() dto: UpdateSettingDto) {
+    return this.settingsService.update(dto);
   }
 
   @Delete(':id')

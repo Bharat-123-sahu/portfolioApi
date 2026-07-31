@@ -5,12 +5,11 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { DashboardService } from './dashboard.service';
 
 @ApiTags('Dashboard')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('api/v1/admin/dashboard')
 export class DashboardController {
-
-  constructor(
-    private readonly dashboardService: DashboardService,
-  ) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)

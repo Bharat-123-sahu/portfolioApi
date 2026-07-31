@@ -12,9 +12,12 @@ export class AboutService {
   private readonly logger = new Logger(AboutService.name);
 
   async create(createAboutDto: CreateAboutDto) {
-    const about = await AboutModel(mongoose.connection).findOne({
-      heading: createAboutDto.heading,
-    });
+    const about = await AboutModel(mongoose.connection)
+      .findOne({
+        heading: createAboutDto.heading,
+      })
+      .select('_id')
+      .lean();
 
     if (about) {
       throw new HttpException('About already exists.', HttpStatus.CONFLICT);
@@ -50,7 +53,8 @@ export class AboutService {
         .find(searchFilter)
         .skip(skip)
         .limit(perPage)
-        .sort({ createdAt: -1 }),
+        .sort({ createdAt: -1 })
+        .lean(),
 
       AboutModel(mongoose.connection).countDocuments(searchFilter),
     ]);
@@ -65,7 +69,7 @@ export class AboutService {
   }
 
   async findOne(id: string) {
-    const about = await AboutModel(mongoose.connection).findById(id);
+    const about = await AboutModel(mongoose.connection).findById(id).lean();
 
     if (!about) {
       throw new HttpException('About not found.', HttpStatus.NOT_FOUND);
@@ -78,13 +82,11 @@ export class AboutService {
   }
 
   async update(id: string, updateAboutDto: UpdateAboutDto) {
-    const about = await AboutModel(mongoose.connection).findByIdAndUpdate(
-      id,
-      updateAboutDto,
-      {
+    const about = await AboutModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateAboutDto, {
         new: true,
-      },
-    );
+      })
+      .lean();
 
     if (!about) {
       throw new HttpException('About not found.', HttpStatus.NOT_FOUND);
@@ -98,7 +100,10 @@ export class AboutService {
   }
 
   async remove(id: string) {
-    const about = await AboutModel(mongoose.connection).findByIdAndDelete(id);
+    const about = await AboutModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!about) {
       throw new HttpException('About not found.', HttpStatus.NOT_FOUND);

@@ -1,11 +1,5 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
-
 
 import { CreateSocialLinkDto } from './dto/create-social-link.dto';
 import { UpdateSocialLinkDto } from './dto/update-social-link.dto';
@@ -17,11 +11,12 @@ export class SocialLinkService {
   private readonly logger = new Logger(SocialLinkService.name);
 
   async create(createSocialLinkDto: CreateSocialLinkDto) {
-    const socialLink = await SocialLinkModel(
-      mongoose.connection,
-    ).findOne({
-      platform: createSocialLinkDto.platform,
-    });
+    const socialLink = await SocialLinkModel(mongoose.connection)
+      .findOne({
+        platform: createSocialLinkDto.platform,
+      })
+      .select('_id')
+      .lean();
 
     if (socialLink) {
       throw new HttpException(
@@ -30,9 +25,9 @@ export class SocialLinkService {
       );
     }
 
-    const socialLinkData = await SocialLinkModel(
-      mongoose.connection,
-    ).create(createSocialLinkDto);
+    const socialLinkData = await SocialLinkModel(mongoose.connection).create(
+      createSocialLinkDto,
+    );
 
     return {
       success: true,
@@ -81,7 +76,8 @@ export class SocialLinkService {
           createdAt: -1,
         })
         .skip(skip)
-        .limit(perPage),
+        .limit(perPage)
+        .lean(),
 
       SocialLinkModel(mongoose.connection).countDocuments(filter),
     ]);
@@ -96,15 +92,12 @@ export class SocialLinkService {
   }
 
   async findOne(id: string) {
-    const socialLink = await SocialLinkModel(
-      mongoose.connection,
-    ).findById(id);
+    const socialLink = await SocialLinkModel(mongoose.connection)
+      .findById(id)
+      .lean();
 
     if (!socialLink) {
-      throw new HttpException(
-        'Social link not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Social link not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -113,17 +106,15 @@ export class SocialLinkService {
     };
   }
 
-  async update(
-    id: string,
-    updateSocialLinkDto: UpdateSocialLinkDto,
-  ) {
+  async update(id: string, updateSocialLinkDto: UpdateSocialLinkDto) {
     if (updateSocialLinkDto.platform) {
-      const existing = await SocialLinkModel(
-        mongoose.connection,
-      ).findOne({
-        platform: updateSocialLinkDto.platform,
-        _id: { $ne: id },
-      });
+      const existing = await SocialLinkModel(mongoose.connection)
+        .findOne({
+          platform: updateSocialLinkDto.platform,
+          _id: { $ne: id },
+        })
+        .select('_id')
+        .lean();
 
       if (existing) {
         throw new HttpException(
@@ -133,17 +124,14 @@ export class SocialLinkService {
       }
     }
 
-    const socialLink = await SocialLinkModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateSocialLinkDto, {
-      new: true,
-    });
+    const socialLink = await SocialLinkModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateSocialLinkDto, {
+        new: true,
+      })
+      .lean();
 
     if (!socialLink) {
-      throw new HttpException(
-        'Social link not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Social link not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -154,15 +142,13 @@ export class SocialLinkService {
   }
 
   async remove(id: string) {
-    const socialLink = await SocialLinkModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const socialLink = await SocialLinkModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!socialLink) {
-      throw new HttpException(
-        'Social link not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Social link not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

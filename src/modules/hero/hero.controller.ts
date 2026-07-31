@@ -19,6 +19,8 @@ import { UpdateHeroDto } from './dto/update-hero.dto';
 import { ListHeroDto } from './dto/list-hero.dto';
 
 @ApiTags('Hero')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/hero')
 export class HeroController {
   private readonly logger = new Logger(HeroController.name);
@@ -51,7 +53,7 @@ export class HeroController {
   })
   async findOne(@Param('id') id: string) {
     this.logger.log(`Get Hero API called. Id: ${id}`);
-    return this.heroService.findOne(+id);
+    return this.heroService.findOne(id);
   }
 
   @Patch(':id')

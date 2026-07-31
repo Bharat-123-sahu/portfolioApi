@@ -1,11 +1,5 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
-
 
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -17,20 +11,20 @@ export class ContactService {
   private readonly logger = new Logger(ContactService.name);
 
   async create(createContactDto: CreateContactDto) {
-    const contact = await ContactModel(mongoose.connection).findOne({
-      email: createContactDto.email,
-    });
+    const contact = await ContactModel(mongoose.connection)
+      .findOne({
+        email: createContactDto.email,
+      })
+      .select('_id')
+      .lean();
 
     if (contact) {
-      throw new HttpException(
-        'Contact already exists.',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Contact already exists.', HttpStatus.CONFLICT);
     }
 
-    const contactData = await ContactModel(
-      mongoose.connection,
-    ).create(createContactDto);
+    const contactData = await ContactModel(mongoose.connection).create(
+      createContactDto,
+    );
 
     return {
       success: true,
@@ -85,7 +79,8 @@ export class ContactService {
           createdAt: -1,
         })
         .skip(skip)
-        .limit(perPage),
+        .limit(perPage)
+        .lean(),
 
       ContactModel(mongoose.connection).countDocuments(filter),
     ]);
@@ -100,15 +95,10 @@ export class ContactService {
   }
 
   async findOne(id: string) {
-    const contact = await ContactModel(
-      mongoose.connection,
-    ).findById(id);
+    const contact = await ContactModel(mongoose.connection).findById(id).lean();
 
     if (!contact) {
-      throw new HttpException(
-        'Contact not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Contact not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -117,37 +107,29 @@ export class ContactService {
     };
   }
 
-  async update(
-    id: string,
-    updateContactDto: UpdateContactDto,
-  ) {
+  async update(id: string, updateContactDto: UpdateContactDto) {
     if (updateContactDto.email) {
-      const existing = await ContactModel(
-        mongoose.connection,
-      ).findOne({
-        email: updateContactDto.email,
-        _id: { $ne: id },
-      });
+      const existing = await ContactModel(mongoose.connection)
+        .findOne({
+          email: updateContactDto.email,
+          _id: { $ne: id },
+        })
+        .select('_id')
+        .lean();
 
       if (existing) {
-        throw new HttpException(
-          'Email already exists.',
-          HttpStatus.CONFLICT,
-        );
+        throw new HttpException('Email already exists.', HttpStatus.CONFLICT);
       }
     }
 
-    const contact = await ContactModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateContactDto, {
-      new: true,
-    });
+    const contact = await ContactModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateContactDto, {
+        new: true,
+      })
+      .lean();
 
     if (!contact) {
-      throw new HttpException(
-        'Contact not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Contact not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -158,15 +140,13 @@ export class ContactService {
   }
 
   async remove(id: string) {
-    const contact = await ContactModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const contact = await ContactModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!contact) {
-      throw new HttpException(
-        'Contact not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Contact not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

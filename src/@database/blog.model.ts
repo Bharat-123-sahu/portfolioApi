@@ -126,6 +126,15 @@ BlogSchema.index({ isPublished: 1 });
 BlogSchema.index({ isFeatured: 1 });
 BlogSchema.index({ category: 1 });
 BlogSchema.index({ displayOrder: 1 });
+BlogSchema.index({ displayOrder: 1, createdAt: -1 });
+BlogSchema.index({
+  isPublished: 1,
+  isActive: 1,
+  displayOrder: 1,
+  createdAt: -1,
+});
+BlogSchema.index({ category: 1, displayOrder: 1, createdAt: -1 });
+BlogSchema.index({ updatedAt: -1 });
 
 export const BlogModel = (connection: Connection) =>
   connection.model<IBlog>('Blog', BlogSchema);

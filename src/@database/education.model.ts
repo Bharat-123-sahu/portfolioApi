@@ -70,5 +70,10 @@ const EducationSchema = new Schema<IEducation>(
   },
 );
 
+EducationSchema.index({ displayOrder: 1, startYear: -1 });
+EducationSchema.index({ isActive: 1, displayOrder: 1, startYear: -1 });
+EducationSchema.index({ instituteName: 1 });
+EducationSchema.index({ updatedAt: -1 });
+
 export const EducationModel = (connection: Connection) =>
   connection.model<IEducation>('Education', EducationSchema);

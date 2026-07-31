@@ -45,7 +45,8 @@ export class ExperienceService {
         .sort({
           displayOrder: 1,
           startDate: -1,
-        }),
+        })
+        .lean(),
 
       ExperienceModel(mongoose.connection).countDocuments(searchFilter),
     ]);
@@ -60,7 +61,9 @@ export class ExperienceService {
   }
 
   async findOne(id: string) {
-    const experience = await ExperienceModel(mongoose.connection).findById(id);
+    const experience = await ExperienceModel(mongoose.connection)
+      .findById(id)
+      .lean();
 
     if (!experience) {
       throw new HttpException('Experience not found.', HttpStatus.NOT_FOUND);
@@ -72,12 +75,36 @@ export class ExperienceService {
     };
   }
 
+  async findCurrent() {
+    const experiences = await ExperienceModel(mongoose.connection)
+      .find({ isActive: true, currentlyWorking: true })
+      .sort({ displayOrder: 1, startDate: -1 })
+      .lean();
+
+    return {
+      success: true,
+      experiences,
+    };
+  }
+
+  async findActive() {
+    const experiences = await ExperienceModel(mongoose.connection)
+      .find({ isActive: true })
+      .sort({ displayOrder: 1, startDate: -1 })
+      .lean();
+
+    return {
+      success: true,
+      experiences,
+    };
+  }
+
   async update(id: string, updateExperienceDto: UpdateExperienceDto) {
-    const experience = await ExperienceModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateExperienceDto, {
-      new: true,
-    });
+    const experience = await ExperienceModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateExperienceDto, {
+        new: true,
+      })
+      .lean();
 
     if (!experience) {
       throw new HttpException('Experience not found.', HttpStatus.NOT_FOUND);
@@ -91,9 +118,10 @@ export class ExperienceService {
   }
 
   async remove(id: string) {
-    const experience = await ExperienceModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const experience = await ExperienceModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!experience) {
       throw new HttpException('Experience not found.', HttpStatus.NOT_FOUND);

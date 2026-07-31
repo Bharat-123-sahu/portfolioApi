@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SocialLinksController } from './social-links.controller';
-import { SocialLinksService } from './social-links.service';
+import { SocialLinkController } from './social-links.controller';
+import { SocialLinkService } from './social-links.service';
 
-describe('SocialLinksController', () => {
-  let controller: SocialLinksController;
+describe('SocialLinkController', () => {
+  let controller: SocialLinkController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [SocialLinksController],
-      providers: [SocialLinksService],
+      controllers: [SocialLinkController],
+      providers: [SocialLinkService],
     }).compile();
 
-    controller = module.get<SocialLinksController>(SocialLinksController);
+    controller = module.get<SocialLinkController>(SocialLinkController);
   });
 
   it('should be defined', () => {

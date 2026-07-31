@@ -26,11 +26,13 @@ import { UpdateEducationDto } from './dto/update-education.dto';
 import { ListEducationDto } from './dto/list-education.dto';
 
 @ApiTags('Education')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/education')
 export class EducationController {
   private readonly logger = new Logger(EducationController.name);
 
-  constructor(private readonly experienceService: EducationService) {}
+  constructor(private readonly educationService: EducationService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -49,13 +51,13 @@ export class EducationController {
   })
   async create(@Body() createEducationDto: CreateEducationDto) {
     this.logger.log('Create Education API Called');
-    return this.experienceService.create(createEducationDto);
+    return this.educationService.create(createEducationDto);
   }
 
   @Get()
   @ApiOperation({
     summary: 'Get Education List',
-    description: 'Retrieve all experiences.',
+    description: 'Retrieve all education records.',
   })
   @ApiQuery({
     name: 'page',
@@ -75,7 +77,17 @@ export class EducationController {
   })
   async findAll(@Query() listEducationDto: ListEducationDto) {
     this.logger.log('Get Education List API Called');
-    return this.experienceService.findAll(listEducationDto);
+    return this.educationService.findAll(listEducationDto);
+  }
+
+  @Get('active')
+  @ApiOperation({
+    summary: 'Get Active Education',
+    description: 'Retrieve active education records.',
+  })
+  async findActive() {
+    this.logger.log('Get Active Education API Called');
+    return this.educationService.findActive();
   }
 
   @Get(':id')
@@ -97,7 +109,7 @@ export class EducationController {
   })
   async findOne(@Param('id') id: string) {
     this.logger.log(`Get Education : ${id}`);
-    return this.experienceService.findOne(id);
+    return this.educationService.findOne(id);
   }
 
   @Patch(':id')
@@ -124,7 +136,7 @@ export class EducationController {
     @Body() updateEducationDto: UpdateEducationDto,
   ) {
     this.logger.log(`Update Education : ${id}`);
-    return this.experienceService.update(id, updateEducationDto);
+    return this.educationService.update(id, updateEducationDto);
   }
 
   @Delete(':id')
@@ -148,6 +160,6 @@ export class EducationController {
   })
   async remove(@Param('id') id: string) {
     this.logger.log(`Delete Education : ${id}`);
-    return this.experienceService.remove(id);
+    return this.educationService.remove(id);
   }
 }

@@ -97,5 +97,10 @@ const ProjectSchema = new Schema<IProject>(
   },
 );
 
+ProjectSchema.index({ displayOrder: 1, createdAt: -1 });
+ProjectSchema.index({ isActive: 1, displayOrder: 1, createdAt: -1 });
+ProjectSchema.index({ title: 1 });
+ProjectSchema.index({ updatedAt: -1 });
+
 export const ProjectModel = (connection: Connection) =>
   connection.model<IProject>('Project', ProjectSchema);

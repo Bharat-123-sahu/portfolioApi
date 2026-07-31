@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,11 +25,11 @@ import { SocialLinkService } from './social-links.service';
 import { ListSocialLinkDto } from './dto/list-social-links.dto';
 
 @ApiTags('Social Link')
-@Controller('social-link')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
+@Controller(['api/v1/admin/social-links', 'social-link'])
 export class SocialLinkController {
-  constructor(
-    private readonly socialLinkService: SocialLinkService,
-  ) {}
+  constructor(private readonly socialLinkService: SocialLinkService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -60,13 +61,11 @@ export class SocialLinkController {
   }
 
   @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Social Link' })
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateSocialLinkDto,
-  ) {
+  update(@Param('id') id: string, @Body() dto: UpdateSocialLinkDto) {
     return this.socialLinkService.update(id, dto);
   }
 

@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
 
 import { SettingsModel } from 'src/@database/settings.model';
@@ -17,22 +12,20 @@ export class SettingsService {
   private readonly logger = new Logger(SettingsService.name);
 
   async create(createSettingsDto: CreateSettingsDto) {
-    const settings = await SettingsModel(
-      mongoose.connection,
-    ).findOne({
-      siteTitle: createSettingsDto.siteTitle,
-    });
+    const settings = await SettingsModel(mongoose.connection)
+      .findOne({
+        siteTitle: createSettingsDto.siteTitle,
+      })
+      .select('_id')
+      .lean();
 
     if (settings) {
-      throw new HttpException(
-        'Settings already exists.',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Settings already exists.', HttpStatus.CONFLICT);
     }
 
-    const settingsData = await SettingsModel(
-      mongoose.connection,
-    ).create(createSettingsDto);
+    const settingsData = await SettingsModel(mongoose.connection).create(
+      createSettingsDto,
+    );
 
     return {
       success: true,
@@ -57,7 +50,8 @@ export class SettingsService {
         .find(filter)
         .skip(skip)
         .limit(perPage)
-        .sort({ createdAt: -1 }),
+        .sort({ createdAt: -1 })
+        .lean(),
 
       SettingsModel(mongoose.connection).countDocuments(filter),
     ]);
@@ -72,15 +66,12 @@ export class SettingsService {
   }
 
   async findOne(id: string) {
-    const settings = await SettingsModel(
-      mongoose.connection,
-    ).findById(id);
+    const settings = await SettingsModel(mongoose.connection)
+      .findById(id)
+      .lean();
 
     if (!settings) {
-      throw new HttpException(
-        'Settings not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Settings not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -89,21 +80,15 @@ export class SettingsService {
     };
   }
 
-  async update(
-    id: string,
-    updateSettingsDto: UpdateSettingDto,
-  ) {
-    const settings = await SettingsModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateSettingsDto, {
-      new: true,
-    });
+  async update( updateSettingsDto: UpdateSettingDto) {
+    const settings = await SettingsModel(mongoose.connection)
+      .findByIdAndUpdate(updateSettingsDto, {
+        new: true,
+      })
+      .lean();
 
     if (!settings) {
-      throw new HttpException(
-        'Settings not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Settings not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -114,15 +99,13 @@ export class SettingsService {
   }
 
   async remove(id: string) {
-    const settings = await SettingsModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const settings = await SettingsModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!settings) {
-      throw new HttpException(
-        'Settings not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Settings not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

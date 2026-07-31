@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
 
 import { EducationModel } from 'src/@database/education.model';
@@ -17,9 +12,9 @@ export class EducationService {
   private readonly logger = new Logger(EducationService.name);
 
   async create(createEducationDto: CreateEducationDto) {
-    const education = await EducationModel(
-      mongoose.connection,
-    ).create(createEducationDto);
+    const education = await EducationModel(mongoose.connection).create(
+      createEducationDto,
+    );
 
     return {
       success: true,
@@ -42,7 +37,7 @@ export class EducationService {
         }
       : {};
 
-    const [education, total] = await Promise.all([
+    const [educations, total] = await Promise.all([
       EducationModel(mongoose.connection)
         .find(searchFilter)
         .skip(skip)
@@ -50,11 +45,10 @@ export class EducationService {
         .sort({
           displayOrder: 1,
           startYear: -1,
-        }),
+        })
+        .lean(),
 
-      EducationModel(mongoose.connection).countDocuments(
-        searchFilter,
-      ),
+      EducationModel(mongoose.connection).countDocuments(searchFilter),
     ]);
 
     return {
@@ -62,20 +56,17 @@ export class EducationService {
       perPage,
       total,
       totalPages: Math.ceil(total / perPage),
-      education,
+      educations,
     };
   }
 
   async findOne(id: string) {
-    const education = await EducationModel(
-      mongoose.connection,
-    ).findById(id);
+    const education = await EducationModel(mongoose.connection)
+      .findById(id)
+      .lean();
 
     if (!education) {
-      throw new HttpException(
-        'Education not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Education not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -84,21 +75,27 @@ export class EducationService {
     };
   }
 
-  async update(
-    id: string,
-    updateEducationDto: UpdateEducationDto,
-  ) {
-    const education = await EducationModel(
-      mongoose.connection,
-    ).findByIdAndUpdate(id, updateEducationDto, {
-      new: true,
-    });
+  async findActive() {
+    const educations = await EducationModel(mongoose.connection)
+      .find({ isActive: true })
+      .sort({ displayOrder: 1, startYear: -1 })
+      .lean();
+
+    return {
+      success: true,
+      educations,
+    };
+  }
+
+  async update(id: string, updateEducationDto: UpdateEducationDto) {
+    const education = await EducationModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateEducationDto, {
+        new: true,
+      })
+      .lean();
 
     if (!education) {
-      throw new HttpException(
-        'Education not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Education not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -109,15 +106,13 @@ export class EducationService {
   }
 
   async remove(id: string) {
-    const education = await EducationModel(
-      mongoose.connection,
-    ).findByIdAndDelete(id);
+    const education = await EducationModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!education) {
-      throw new HttpException(
-        'Education not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Education not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

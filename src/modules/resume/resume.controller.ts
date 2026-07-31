@@ -25,8 +25,9 @@ import { CreateResumeDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
 import { ListResumeDto } from './dto/list-resume-dto';
 
-
 @ApiTags('Resume')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/resumes')
 export class ResumeController {
   private readonly logger = new Logger(ResumeController.name);
@@ -77,6 +78,24 @@ export class ResumeController {
   async findAll(@Query() listResumeDto: ListResumeDto) {
     this.logger.log('Get Resume List API Called');
     return this.resumeService.findAll(listResumeDto);
+  }
+
+  @Get('default')
+  @ApiOperation({
+    summary: 'Get Default Resume',
+    description: 'Retrieve the active default resume.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Default resume retrieved successfully.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Default resume not found.',
+  })
+  async findDefault() {
+    this.logger.log('Get Default Resume API Called');
+    return this.resumeService.findDefault();
   }
 
   @Get(':id')

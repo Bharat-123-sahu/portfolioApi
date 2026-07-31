@@ -26,6 +26,8 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { ListProjectDto } from './dto/list.project.dto';
 
 @ApiTags('Project')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/projects')
 export class ProjectsController {
   private readonly logger = new Logger(ProjectsController.name);
@@ -80,6 +82,26 @@ export class ProjectsController {
   async findAll(@Query() listProjectDto: ListProjectDto) {
     this.logger.log('Get Project List API Called');
     return this.projectService.findAll(listProjectDto);
+  }
+
+  @Get('featured')
+  @ApiOperation({
+    summary: 'Get Featured Projects',
+    description: 'Retrieve active projects marked as featured.',
+  })
+  async findFeatured() {
+    this.logger.log('Get Featured Projects API Called');
+    return this.projectService.findFeatured();
+  }
+
+  @Get('active')
+  @ApiOperation({
+    summary: 'Get Active Projects',
+    description: 'Retrieve active projects.',
+  })
+  async findActive() {
+    this.logger.log('Get Active Projects API Called');
+    return this.projectService.findActive();
   }
 
   @Get(':id')

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,11 +25,11 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 import { ListContactDto } from './dto/list-contact.dto';
 
 @ApiTags('Contact')
-@Controller('contact')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
+@Controller(['api/v1/admin/contact', 'contact'])
 export class ContactController {
-  constructor(
-    private readonly contactService: ContactService,
-  ) {}
+  constructor(private readonly contactService: ContactService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -90,6 +91,7 @@ export class ContactController {
   }
 
   @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
@@ -101,10 +103,7 @@ export class ContactController {
     @Body()
     updateContactDto: UpdateContactDto,
   ) {
-    return this.contactService.update(
-      id,
-      updateContactDto,
-    );
+    return this.contactService.update(id, updateContactDto);
   }
 
   @Delete(':id')

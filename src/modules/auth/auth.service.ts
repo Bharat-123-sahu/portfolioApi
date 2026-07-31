@@ -10,9 +10,11 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   async login(loginDto: LoginDto) {
-    const user = await UserModel(mongoose.connection).findOne({
-      email: loginDto.email,
-    });
+    const user = await UserModel(mongoose.connection)
+      .findOne({
+        email: loginDto.email,
+      })
+      .lean();
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password.');
@@ -52,10 +54,20 @@ export class AuthService {
   comparePasswords(plainPassword: string, hashedPassword: string): boolean {
     const [salt, hash] = hashedPassword.split(':');
 
+    if (!salt || !hash) {
+      return false;
+    }
+
     const hashToCompare = crypto
       .pbkdf2Sync(plainPassword, salt, 10000, 64, 'sha512')
       .toString('hex');
 
-    return hash === hashToCompare;
+    const storedHash = Buffer.from(hash, 'hex');
+    const computedHash = Buffer.from(hashToCompare, 'hex');
+
+    return (
+      storedHash.length === computedHash.length &&
+      crypto.timingSafeEqual(storedHash, computedHash)
+    );
   }
 }

@@ -139,6 +139,15 @@ ContactSchema.index({ phone: 1 });
 ContactSchema.index({ availableForHire: 1 });
 ContactSchema.index({ displayOrder: 1 });
 ContactSchema.index({ isActive: 1 });
+ContactSchema.index({ displayOrder: 1, createdAt: -1 });
+ContactSchema.index({
+  isActive: 1,
+  availableForHire: 1,
+  displayOrder: 1,
+  createdAt: -1,
+});
+ContactSchema.index({ name: 1 });
+ContactSchema.index({ updatedAt: -1 });
 
 export const ContactModel = (connection: Connection) =>
   connection.model<IContact>('Contact', ContactSchema);

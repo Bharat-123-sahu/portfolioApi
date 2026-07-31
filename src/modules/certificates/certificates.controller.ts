@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,11 +25,11 @@ import { ListCertificateDto } from './dto/list-certificate.dto';
 import { CertificateService } from './certificates.service';
 
 @ApiTags('Certificate')
-@Controller('certificate')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
+@Controller(['api/v1/admin/certificates', 'certificate'])
 export class CertificateController {
-  constructor(
-    private readonly certificateService: CertificateService,
-  ) {}
+  constructor(private readonly certificateService: CertificateService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -59,13 +60,11 @@ export class CertificateController {
   }
 
   @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Certificate' })
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateCertificateDto,
-  ) {
+  update(@Param('id') id: string, @Body() dto: UpdateCertificateDto) {
     return this.certificateService.update(id, dto);
   }
 

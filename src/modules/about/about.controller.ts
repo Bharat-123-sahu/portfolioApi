@@ -19,6 +19,8 @@ import { UpdateAboutDto } from './dto/update-about.dto';
 import { ListAboutDto } from './dto/list-about.dto';
 
 @ApiTags('About')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('api/v1/admin/about')
 export class AboutController {
   private readonly logger = new Logger(AboutController.name);

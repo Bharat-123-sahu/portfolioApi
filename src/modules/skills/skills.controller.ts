@@ -26,6 +26,8 @@ import { SkillsService } from './skills.service';
 import { ListSkillDto } from './dto/list-skills.dto';
 
 @ApiTags('Skill')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
 @Controller('/api/v1/admin/skills')
 export class SkillsController {
   private readonly logger = new Logger(SkillsController.name);

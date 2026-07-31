@@ -33,5 +33,9 @@ const HeroSchema = new Schema<IHero>(
   },
 );
 
+HeroSchema.index({ title: 1 });
+HeroSchema.index({ isActive: 1, createdAt: -1 });
+HeroSchema.index({ createdAt: -1 });
+
 export const HeroModel = (connection: Connection) =>
   connection.model<IHero>('Hero', HeroSchema);

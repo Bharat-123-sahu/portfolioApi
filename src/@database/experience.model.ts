@@ -75,5 +75,10 @@ const ExperienceSchema = new Schema<IExperience>(
   },
 );
 
+ExperienceSchema.index({ displayOrder: 1, startDate: -1 });
+ExperienceSchema.index({ isActive: 1, displayOrder: 1, startDate: -1 });
+ExperienceSchema.index({ companyName: 1 });
+ExperienceSchema.index({ updatedAt: -1 });
+
 export const ExperienceModel = (connection: Connection) =>
   connection.model<IExperience>('Experience', ExperienceSchema);

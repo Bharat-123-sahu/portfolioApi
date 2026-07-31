@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import mongoose from 'mongoose';
 
 import { BlogModel } from 'src/@database/blog.model';
@@ -17,9 +12,12 @@ export class BlogService {
   private readonly logger = new Logger(BlogService.name);
 
   async create(createBlogDto: CreateBlogDto) {
-    const blog = await BlogModel(mongoose.connection).findOne({
-      slug: createBlogDto.slug,
-    });
+    const blog = await BlogModel(mongoose.connection)
+      .findOne({
+        slug: createBlogDto.slug,
+      })
+      .select('_id')
+      .lean();
 
     if (blog) {
       throw new HttpException(
@@ -28,9 +26,7 @@ export class BlogService {
       );
     }
 
-    const blogData = await BlogModel(mongoose.connection).create(
-      createBlogDto,
-    );
+    const blogData = await BlogModel(mongoose.connection).create(createBlogDto);
 
     return {
       success: true,
@@ -93,7 +89,8 @@ export class BlogService {
           createdAt: -1,
         })
         .skip(skip)
-        .limit(perPage),
+        .limit(perPage)
+        .lean(),
 
       BlogModel(mongoose.connection).countDocuments(filter),
     ]);
@@ -108,13 +105,10 @@ export class BlogService {
   }
 
   async findOne(id: string) {
-    const blog = await BlogModel(mongoose.connection).findById(id);
+    const blog = await BlogModel(mongoose.connection).findById(id).lean();
 
     if (!blog) {
-      throw new HttpException(
-        'Blog not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Blog not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -125,12 +119,15 @@ export class BlogService {
 
   async update(id: string, updateBlogDto: UpdateBlogDto) {
     if (updateBlogDto.slug) {
-      const existingBlog = await BlogModel(mongoose.connection).findOne({
-        slug: updateBlogDto.slug,
-        _id: {
-          $ne: id,
-        },
-      });
+      const existingBlog = await BlogModel(mongoose.connection)
+        .findOne({
+          slug: updateBlogDto.slug,
+          _id: {
+            $ne: id,
+          },
+        })
+        .select('_id')
+        .lean();
 
       if (existingBlog) {
         throw new HttpException(
@@ -140,19 +137,14 @@ export class BlogService {
       }
     }
 
-    const blog = await BlogModel(mongoose.connection).findByIdAndUpdate(
-      id,
-      updateBlogDto,
-      {
+    const blog = await BlogModel(mongoose.connection)
+      .findByIdAndUpdate(id, updateBlogDto, {
         new: true,
-      },
-    );
+      })
+      .lean();
 
     if (!blog) {
-      throw new HttpException(
-        'Blog not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Blog not found.', HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -163,13 +155,13 @@ export class BlogService {
   }
 
   async remove(id: string) {
-    const blog = await BlogModel(mongoose.connection).findByIdAndDelete(id);
+    const blog = await BlogModel(mongoose.connection)
+      .findByIdAndDelete(id)
+      .select('_id')
+      .lean();
 
     if (!blog) {
-      throw new HttpException(
-        'Blog not found.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Blog not found.', HttpStatus.NOT_FOUND);
     }
 
     return {

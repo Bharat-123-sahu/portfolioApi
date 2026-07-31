@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -24,7 +25,9 @@ import { ListBlogDto } from './dto/list-blog.dto';
 import { BlogService } from './blogs.service';
 
 @ApiTags('Blog')
-@Controller('blog')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('access-token')
+@Controller(['api/v1/admin/blogs', 'blog'])
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
@@ -86,16 +89,14 @@ export class BlogController {
     return this.blogService.findOne(id);
   }
 
-  @Put(':id')
+  // @Put(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update Blog',
   })
-  update(
-    @Param('id') id: string,
-    @Body() updateBlogDto: UpdateBlogDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
     return this.blogService.update(id, updateBlogDto);
   }
 
