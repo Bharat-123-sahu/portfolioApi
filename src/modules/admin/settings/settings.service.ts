@@ -80,10 +80,33 @@ export class SettingsService {
     };
   }
 
-  async update( updateSettingsDto: UpdateSettingDto) {
+  async update(updateSettingsDto: UpdateSettingDto) {
+    const currentSettings = await SettingsModel(mongoose.connection)
+      .findOne({})
+      .sort({ isActive: -1, createdAt: -1 })
+      .select('_id')
+      .lean();
+
+    if (!currentSettings) {
+      const settings = await SettingsModel(mongoose.connection).create(
+        updateSettingsDto,
+      );
+
+      return {
+        success: true,
+        message: 'Settings created successfully.',
+        settings,
+      };
+    }
+
+    return this.updateById(String(currentSettings._id), updateSettingsDto);
+  }
+
+  async updateById(id: string, updateSettingsDto: UpdateSettingDto) {
     const settings = await SettingsModel(mongoose.connection)
-      .findByIdAndUpdate(updateSettingsDto, {
+      .findByIdAndUpdate(id, updateSettingsDto, {
         new: true,
+        runValidators: true,
       })
       .lean();
 

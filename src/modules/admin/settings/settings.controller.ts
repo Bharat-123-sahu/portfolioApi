@@ -59,12 +59,19 @@ export class SettingsController {
   }
 
   @Put()
-  // @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update Settings' })
   update(@Body() dto: UpdateSettingDto) {
     return this.settingsService.update(dto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Update Settings By Id' })
+  updateById(@Param('id') id: string, @Body() dto: UpdateSettingDto) {
+    return this.settingsService.updateById(id, dto);
   }
 
   @Delete(':id')

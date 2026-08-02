@@ -41,7 +41,7 @@ export class CreateExperienceDto {
     example: '2025-06-15',
   })
   @IsDateString()
-  startDate: Date;
+  startDate: string;
 
   @ApiProperty({
     example: '2026-07-31',
@@ -50,7 +50,7 @@ export class CreateExperienceDto {
   })
   @IsOptional()
   @IsDateString()
-  endDate?: Date;
+  endDate?: string;
 
   @ApiProperty({
     example: false,

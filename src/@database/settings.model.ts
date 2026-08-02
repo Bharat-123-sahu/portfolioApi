@@ -14,7 +14,6 @@ export interface ISettings {
   secondaryColor: string;
   accentColor: string;
 
-  defaultProfileImage: string;
   defaultResume: string;
 
   contactEmail: string;
@@ -91,11 +90,6 @@ const SettingsSchema = new Schema<ISettings>(
     accentColor: {
       type: String,
       default: '#2dd36f',
-    },
-
-    defaultProfileImage: {
-      type: String,
-      default: '',
     },
 
     defaultResume: {

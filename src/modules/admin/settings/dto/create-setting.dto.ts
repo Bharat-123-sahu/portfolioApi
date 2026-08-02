@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsOptional,
   IsString,
+  ValidateIf,
   
 } from 'class-validator';
 
@@ -46,17 +47,13 @@ export class CreateSettingsDto {
 
   @IsOptional()
   @IsString()
-  defaultProfileImage?: string;
-
-  @IsOptional()
-  @IsString()
   defaultResume?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined && value !== null && value !== '')
   @IsEmail()
   contactEmail?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined && value !== null && value !== '')
   @IsEmail()
   supportEmail?: string;
 

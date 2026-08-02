@@ -30,6 +30,7 @@ import { PublicBlogModule } from './modules/public/public-blog/public-blog.modul
 import { PublicContactModule } from './modules/public/public-contact/public-contact.module';
 import { PublicResumeModule } from './modules/public/public-resume/public-resume.module';
 import { PublicSocialLinksModule } from './modules/public/public-social-links/public-social-links.module';
+import { PublicSettingsModule } from './modules/public/public-settings/public-settings.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { PublicSocialLinksModule } from './modules/public/public-social-links/pu
     PublicContactModule,
     PublicResumeModule,
     PublicSocialLinksModule,
+    PublicSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
