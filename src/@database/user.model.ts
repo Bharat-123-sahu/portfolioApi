@@ -1,6 +1,8 @@
 import { Connection, Schema } from 'mongoose';
 
 export interface IUser {
+  _id?: unknown;
+
   name: string;
 
   email: string;
@@ -10,6 +12,14 @@ export interface IUser {
   role: string;
 
   isActive: boolean;
+
+  refreshTokenHash?: string;
+
+  refreshTokenExpiresAt?: Date;
+
+  passwordResetTokenHash?: string;
+
+  passwordResetExpiresAt?: Date;
 
   createdAt?: Date;
 
@@ -45,6 +55,30 @@ const UserSchema = new Schema<IUser>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    refreshTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    refreshTokenExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+
+    passwordResetTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    passwordResetExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
     },
   },
   {
