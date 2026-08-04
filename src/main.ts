@@ -29,12 +29,20 @@ async function bootstrap() {
   const allowedOrigins = getAllowedOrigins();
 
   app.set('trust proxy', 1);
+  logger.log(`Allowed CORS origins: ${JSON.stringify(allowedOrigins)}`);
+
   app.enableCors({
     origin: (origin, callback) => {
+      logger.log(`Incoming request Origin: ${JSON.stringify(origin)}`);
+
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
         return;
       }
+
+      logger.error(
+        `CORS rejected. Origin=${JSON.stringify(origin)}, Allowed=${JSON.stringify(allowedOrigins)}`,
+      );
 
       callback(new Error('Not allowed by CORS'));
     },
