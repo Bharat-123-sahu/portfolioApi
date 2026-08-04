@@ -6,10 +6,13 @@ import { ProjectModel } from 'src/@database/project.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ListProjectDto } from './dto/list.project.dto';
+import { ProjectPreviewService } from './project-preview.service';
 
 @Injectable()
 export class ProjectsService {
   private readonly logger = new Logger(ProjectsService.name);
+
+  constructor(private readonly projectPreviewService: ProjectPreviewService) {}
 
   async create(createProjectDto: CreateProjectDto) {
     const exists = await ProjectModel(mongoose.connection)
@@ -23,9 +26,14 @@ export class ProjectsService {
       throw new HttpException('Project already exists.', HttpStatus.CONFLICT);
     }
 
-    const project = await ProjectModel(mongoose.connection).create(
-      createProjectDto,
-    );
+    const preview =
+      (await this.projectPreviewService.tryFetch(createProjectDto.liveDemoUrl)) ??
+      this.projectPreviewService.empty();
+
+    const project = await ProjectModel(mongoose.connection).create({
+      ...createProjectDto,
+      ...preview,
+    });
 
     return {
       success: true,
@@ -109,10 +117,35 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectDto: UpdateProjectDto) {
+    const existing = await ProjectModel(mongoose.connection)
+      .findById(id)
+      .select('liveDemoUrl')
+      .lean();
+
+    if (!existing) {
+      throw new HttpException('Project not found.', HttpStatus.NOT_FOUND);
+    }
+
+    const nextLiveDemoUrl = updateProjectDto.liveDemoUrl ?? existing.liveDemoUrl;
+    const liveDemoChanged =
+      updateProjectDto.liveDemoUrl !== undefined &&
+      updateProjectDto.liveDemoUrl !== existing.liveDemoUrl;
+    const previewPatch = liveDemoChanged
+      ? (await this.projectPreviewService.tryFetch(nextLiveDemoUrl)) ??
+        this.projectPreviewService.empty()
+      : {};
+
     const project = await ProjectModel(mongoose.connection)
-      .findByIdAndUpdate(id, updateProjectDto, {
-        new: true,
-      })
+      .findByIdAndUpdate(
+        id,
+        {
+          ...updateProjectDto,
+          ...previewPatch,
+        },
+        {
+          new: true,
+        },
+      )
       .lean();
 
     if (!project) {
@@ -123,6 +156,15 @@ export class ProjectsService {
       success: true,
       message: 'Project updated successfully.',
       project: project,
+    };
+  }
+
+  async preview(url: string) {
+    const preview = await this.projectPreviewService.fetch(url);
+
+    return {
+      success: true,
+      preview,
     };
   }
 

@@ -24,6 +24,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ListProjectDto } from './dto/list.project.dto';
+import { PreviewProjectDto } from './dto/preview-project.dto';
 
 @ApiTags('Project')
 @UseGuards(JwtAuthGuard)
@@ -102,6 +103,20 @@ export class ProjectsController {
   async findActive() {
     this.logger.log('Get Active Projects API Called');
     return this.projectService.findActive();
+  }
+
+  @Get('preview')
+  @ApiOperation({
+    summary: 'Preview Project Live URL',
+    description: 'Generate a Microlink website preview for a live demo URL.',
+  })
+  @ApiQuery({
+    name: 'url',
+    required: true,
+  })
+  async preview(@Query() previewProjectDto: PreviewProjectDto) {
+    this.logger.log(`Preview Project URL : ${previewProjectDto.url}`);
+    return this.projectService.preview(previewProjectDto.url);
   }
 
   @Get(':id')

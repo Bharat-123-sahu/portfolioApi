@@ -14,6 +14,11 @@ export interface IProject {
 
   githubUrl: string;
   liveDemoUrl: string;
+  previewTitle: string;
+  previewDescription: string;
+  previewImage: string;
+  favicon: string;
+  domain: string;
   playStoreUrl: string;
   appStoreUrl: string;
 
@@ -69,6 +74,29 @@ const ProjectSchema = new Schema<IProject>(
     liveDemoUrl: {
       type: String,
       default: '',
+    },
+    previewTitle: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    previewDescription: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    previewImage: {
+      type: String,
+      default: '',
+    },
+    favicon: {
+      type: String,
+      default: '',
+    },
+    domain: {
+      type: String,
+      default: '',
+      trim: true,
     },
     playStoreUrl: {
       type: String,
