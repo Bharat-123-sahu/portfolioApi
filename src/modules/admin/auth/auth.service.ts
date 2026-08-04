@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SetupAdminDto } from './dto/setup-admin.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @Injectable()
@@ -36,6 +38,52 @@ export class AuthService {
     private readonly mailService: AuthMailService,
     private readonly rateLimitService: AuthRateLimitService,
   ) {}
+
+  async setupAdmin(dto: SetupAdminDto, token?: string) {
+    const providedToken = (token?.trim() || dto.token?.trim()) ?? '';
+    console.log('Setup Admin Token:', providedToken,typeof providedToken);
+    this.assertSetupToken(providedToken);
+
+    if (dto.password !== dto.confirmPassword) {
+      throw new BadRequestException('Passwords must match.');
+    }
+
+    const email = this.normalizeEmail(dto.email);
+    const existingUser = await this.authRepository.findUserByEmail(email);
+
+    if (existingUser) {
+      throw new BadRequestException(
+        'An admin account already exists for this email.',
+      );
+    }
+
+    try {
+      const user = await this.authRepository.createAdminUser(
+        email,
+        this.cryptoService.hashPassword(dto.password),
+      );
+
+      return {
+        success: true,
+        message: 'Admin account created successfully.',
+        data: {
+          user: {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+          },
+        },
+      };
+    } catch (error) {
+      if (this.isDuplicateKeyError(error)) {
+        throw new BadRequestException(
+          'An admin account already exists for this email.',
+        );
+      }
+
+      throw error;
+    }
+  }
 
   async login(loginDto: LoginDto) {
     const user = await this.authRepository.findUserByEmail(loginDto.email);
@@ -121,7 +169,10 @@ export class AuthService {
       throw new BadRequestException(this.genericOtpMessage);
     }
 
-    if (otpRecord.attempts >= 5 || otpRecord.expiresAt.getTime() <= Date.now()) {
+    if (
+      otpRecord.attempts >= 5 ||
+      otpRecord.expiresAt.getTime() <= Date.now()
+    ) {
       await this.authRepository.deletePasswordOtp(email);
       throw new BadRequestException(this.genericOtpMessage);
     }
@@ -302,5 +353,31 @@ export class AuthService {
 
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
+  }
+
+  private assertSetupToken(token?: string): void {
+    const expectedToken = process.env.ADMIN_SETUP_TOKEN?.trim();
+    const providedToken = token?.trim();
+    console.log('Expected Token:', expectedToken,typeof expectedToken);
+    console.log('Provided Token:', providedToken,typeof providedToken);
+    if (
+      !expectedToken ||
+      !providedToken ||
+      !this.cryptoService.compareTokens(
+        providedToken,
+        this.cryptoService.hashToken(expectedToken),
+      )
+    ) {
+      throw new ForbiddenException('Invalid admin setup token.');
+    }
+  }
+
+  private isDuplicateKeyError(error: unknown): boolean {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === 11000
+    );
   }
 }

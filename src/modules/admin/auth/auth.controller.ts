@@ -1,5 +1,18 @@
-import { Body, Controller, Ip, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Ip,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
@@ -9,6 +22,7 @@ import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SetupAdminDto } from './dto/setup-admin.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 type AuthenticatedRequest = Request & {
@@ -23,6 +37,23 @@ type AuthenticatedRequest = Request & {
 @Controller('/api/v1/admin/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('setup-admin')
+  @ApiOperation({
+    summary: 'Create an admin account using a one-time setup token',
+  })
+  @ApiQuery({
+    name: 'token',
+    required: true,
+    description: 'Secret admin setup token from the backend environment.',
+  })
+  async setupAdmin(
+    @Body() setupAdminDto: SetupAdminDto,
+    @Query('token') token?: string,
+  ) {
+    console.log(token, setupAdminDto.token,"❤️");
+    return this.authService.setupAdmin(setupAdminDto, token);
+  }
 
   @Post('login')
   @ApiOperation({
@@ -47,10 +78,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify password reset OTP',
   })
-  async verifyOtp(
-    @Body() verifyOtpDto: VerifyOtpDto,
-    @Ip() ipAddress: string,
-  ) {
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto, @Ip() ipAddress: string) {
     return this.authService.verifyOtp(verifyOtpDto, ipAddress);
   }
 
@@ -72,10 +100,7 @@ export class AuthController {
     @Req() request: AuthenticatedRequest,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    return this.authService.changePassword(
-      request.user.id,
-      changePasswordDto,
-    );
+    return this.authService.changePassword(request.user.id, changePasswordDto);
   }
 
   @Post('refresh-token')

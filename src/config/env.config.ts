@@ -6,9 +6,6 @@ config();
 const logger = new Logger('Environment');
 const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:4200',
-  'http://localhost:8100',
-  'http://127.0.0.1:4200',
-  'http://127.0.0.1:8100',
 ];
 
 export function isProduction(): boolean {
@@ -20,6 +17,7 @@ export function validateEnvironment(): void {
 
   if (isProduction()) {
     requiredVariables.push('JWT_SECRET');
+    requiredVariables.push('ADMIN_SETUP_TOKEN');
   }
 
   const missingVariables = requiredVariables.filter(
@@ -42,6 +40,13 @@ export function validateEnvironment(): void {
 
   if (isProduction() && !process.env.CORS_ORIGIN && !process.env.CORS_ORIGINS) {
     throw new Error('CORS_ORIGINS must be configured in production.');
+  }
+
+  if (
+    process.env.ADMIN_SETUP_TOKEN &&
+    process.env.ADMIN_SETUP_TOKEN.length < 32
+  ) {
+    throw new Error('ADMIN_SETUP_TOKEN must be at least 32 characters.');
   }
 
   validateNumericEnv('PORT', 1, 65535);

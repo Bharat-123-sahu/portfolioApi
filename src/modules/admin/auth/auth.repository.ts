@@ -37,6 +37,18 @@ export class AuthRepository {
     return query;
   }
 
+  createAdminUser(email: string, passwordHash: string) {
+    const normalizedEmail = this.normalizeEmail(email);
+
+    return this.users.create({
+      name: normalizedEmail.split('@')[0],
+      email: normalizedEmail,
+      password: passwordHash,
+      role: 'admin',
+      isActive: true,
+    });
+  }
+
   async savePasswordOtp(email: string, otpHash: string, expiresAt: Date) {
     const normalizedEmail = this.normalizeEmail(email);
 

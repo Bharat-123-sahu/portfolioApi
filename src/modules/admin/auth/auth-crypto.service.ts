@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthCryptoService {
   hashPassword(plainPassword: string): string {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto
-      .pbkdf2Sync(plainPassword, salt, 10000, 64, 'sha512')
-      .toString('hex');
-
-    return `${salt}:${hash}`;
+    return bcrypt.hashSync(plainPassword, 12);
   }
 
   comparePasswords(plainPassword: string, hashedPassword: string): boolean {
+    if (this.isBcryptHash(hashedPassword)) {
+      return bcrypt.compareSync(plainPassword, hashedPassword);
+    }
+
     const [salt, hash] = hashedPassword.split(':');
 
     if (!salt || !hash) {
@@ -47,7 +47,12 @@ export class AuthCryptoService {
     const actual = Buffer.from(actualHex, 'hex');
 
     return (
-      expected.length === actual.length && crypto.timingSafeEqual(expected, actual)
+      expected.length === actual.length &&
+      crypto.timingSafeEqual(expected, actual)
     );
+  }
+
+  private isBcryptHash(value: string): boolean {
+    return /^\$2[aby]\$\d{2}\$/.test(value);
   }
 }
