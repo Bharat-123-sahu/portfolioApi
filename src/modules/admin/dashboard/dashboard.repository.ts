@@ -162,7 +162,7 @@ export class DashboardRepositoryService {
       files: usage.files,
       unit: 'MB',
       percentage: total > 0 ? Number(((used / total) * 100).toFixed(2)) : 0,
-      icon: 'server-outline',
+      // icon: 'server-outline',
     };
   }
 
